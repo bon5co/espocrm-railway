@@ -22,3 +22,11 @@ RUN chmod +x /usr/local/bin/railway-entrypoint.sh /usr/local/sbin/apache2-foregr
 
 ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh"]
 CMD ["apache2-foreground"]
+
+# Literals a template variable cannot carry: Railway drops a literal defaultValue
+# at generate time and the variable then publishes as a blank required field.
+ENV ESPOCRM_DATABASE_PLATFORM=Postgresql \
+    ESPOCRM_DATABASE_PORT=5432 \
+    ESPOCRM_DATABASE_NAME=railway \
+    ESPOCRM_DATABASE_USER=postgres \
+    ESPOCRM_ADMIN_USERNAME=admin
