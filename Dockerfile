@@ -27,6 +27,6 @@ CMD ["apache2-foreground"]
 # at generate time and the variable then publishes as a blank required field.
 ENV ESPOCRM_DATABASE_PLATFORM=Postgresql \
     ESPOCRM_DATABASE_PORT=5432 \
-    ESPOCRM_DATABASE_NAME=railway \
+    ESPOCRM_DATABASE_NAME=postgres \
     ESPOCRM_DATABASE_USER=postgres \
     ESPOCRM_ADMIN_USERNAME=admin
