@@ -15,6 +15,13 @@ sed -ri "s/^Listen 80$/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-enabled/000-default.conf
 echo "[railway] apache listening on ${PORT}"
 
+# Apache aborts with "More than one MPM loaded" when more than one MPM module
+# is enabled. Force exactly one, whatever the runtime left behind.
+echo "[railway] mpm before: $(ls /etc/apache2/mods-enabled | grep mpm | tr '\n' ' ')"
+rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.*
+a2enmod -q mpm_prefork >/dev/null 2>&1 || true
+echo "[railway] mpm after: $(ls /etc/apache2/mods-enabled | grep mpm | tr '\n' ' ')"
+
 # Re-apply the admin password on every boot. Upstream only ever seeds it on the
 # one-time install path, so a stock instance can never rotate it and a fresh
 # deploy has no SMTP for the emailed reset.
