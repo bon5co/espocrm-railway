@@ -1,0 +1,33 @@
+#!/bin/bash
+# Shadows the upstream apache2-foreground on PATH (/usr/local/sbin precedes
+# /usr/local/bin), so this runs after EspoCRM has installed or migrated and
+# before Apache binds a port.
+set -euo pipefail
+
+cd /var/www/html
+
+# Upstream's setPermissions does `chown -R ./custom`, which does not descend
+# through a symlink given as its argument. Redo it on the real directories.
+chown -R www-data:www-data /var/www/html/data
+
+PORT="${PORT:-8080}"
+sed -ri "s/^Listen 80$/Listen ${PORT}/" /etc/apache2/ports.conf
+sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-enabled/000-default.conf
+echo "[railway] apache listening on ${PORT}"
+
+# Re-apply the admin password on every boot. Upstream only ever seeds it on the
+# one-time install path, so a stock instance can never rotate it and a fresh
+# deploy has no SMTP for the emailed reset.
+if [ "$(bin/command config:get isInstalled 2>/dev/null)" = "true" ]; then
+    if printf '%s\n' "${ESPOCRM_ADMIN_PASSWORD}" \
+        | bin/command set-password "${ESPOCRM_ADMIN_USERNAME:-admin}" >/dev/null 2>&1; then
+        echo "[railway] admin password re-applied for ${ESPOCRM_ADMIN_USERNAME:-admin}"
+    else
+        echo >&2 "[railway] warning: could not re-apply the admin password"
+    fi
+fi
+
+# Scheduled jobs (workflows, email fetching, reminders) need the daemon.
+/usr/local/bin/docker-daemon.sh &
+
+exec /usr/local/bin/apache2-foreground "$@"
