@@ -1,5 +1,9 @@
 # espocrm-railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/espocrm-or-just-updated-open-source-crm-?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+**Deploy on Railway:** [EspoCRM template](https://railway.com/deploy/espocrm-or-just-updated-open-source-crm-?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
 EspoCRM 10.0.6 packaged for Railway.
 
 Upstream image: `espocrm/espocrm:10.0.6`. Published as
